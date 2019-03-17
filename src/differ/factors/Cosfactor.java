@@ -43,8 +43,8 @@ public class Cosfactor extends Factor {
             if (!idx.equals(BigInteger.ONE)) {
                 fl.add(new Cosfactor(idx.subtract(BigInteger.ONE),
                         innerFactor));
-                fl.add(innerFactor.diff());
             }
+            fl.add(innerFactor.diff());
         }
         return new Term(idx.negate(), fl);
     }

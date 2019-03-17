@@ -198,13 +198,20 @@ public class Poly extends BaseFactor {
             return true;
         } else //sin() cos()
         {
-            String pattern = "(sin\\(.*\\))|(cos\\(.*\\))";
-            r = Pattern.compile(pattern);
+            String sinFunStr = "(sin\\((?<inner>.*)\\)(\\^" + numStr + ")?)";
+            String cosFunStr = "(cos\\((?<inner>.*)\\)(\\^" + numStr + ")?)";
+            r = Pattern.compile(sinFunStr);
             m = r.matcher(str);
             if (m.matches()) {
-                return checkLegalFactor(str.substring(4, str.length() - 1));
+                return checkLegalFactor(m.group("inner"));
             } else {
-                return false;
+                r = Pattern.compile(cosFunStr);
+                m = r.matcher(str);
+                if (m.matches()) {
+                    return checkLegalFactor(m.group("inner"));
+                } else {
+                    return false;
+                }
             }
         }
     }
