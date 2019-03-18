@@ -50,8 +50,7 @@ public class Sinfactor extends Factor {
     }
 
     public boolean multMergeable(BaseFactor other) {
-        if (this.getClass() == other.getClass() &&
-                getIndex().equals(((Factor) other).getIndex())) {
+        if (this.getClass() == other.getClass()) {
             if (innerFactor.equals(((Sinfactor) other).innerFactor)) {
                 return true;
             }
@@ -74,7 +73,7 @@ public class Sinfactor extends Factor {
         if (this.getClass() == f.getClass()) {
             return new Sinfactor(basedMerge(f), innerFactor);
         } else {
-            throw new ClassCastException("try to mearge " +
+            throw new ClassCastException("try to merge " +
                     f.getClass().getName() + " to " + getClass().getName());
         }
     }

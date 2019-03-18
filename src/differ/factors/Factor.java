@@ -30,7 +30,7 @@ public abstract class Factor extends BaseFactor {
         String str = str1;
         str = str.replaceAll("\\s+", "");
         BigInteger idx = BigInteger.ONE;
-        Pattern r = Pattern.compile(".*\\^(\\d+)");
+        Pattern r = Pattern.compile(".*\\^([\\+\\-]?\\d+)");
         Matcher m = r.matcher(str);
         if (m.matches()) {
             idx = new BigInteger(m.group(1));

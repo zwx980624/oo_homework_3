@@ -30,8 +30,7 @@ public class Xfactor extends Factor {
     }
 
     public boolean multMergeable(BaseFactor other) {
-        if (this.getClass() == other.getClass() &&
-                getIndex().equals(((Factor) other).getIndex())) {
+        if (this.getClass() == other.getClass()) {
             return true;
         }
         return false;

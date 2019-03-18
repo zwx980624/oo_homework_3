@@ -55,9 +55,8 @@ public class Poly extends BaseFactor {
         str = str.replaceAll("(\\+\\-)|(\\-\\+)", "\\-");
         str = str.replaceAll("\\-", "\\+\\-");
         str = str.replaceAll("\\^\\+", "\\^");
-        if (str.charAt(0) == '+') {
-            str = str.replaceFirst("\\+", "");
-        }
+        str = str.replaceAll("\\*\\+", "\\*");
+
         // 从左到右处理，找到每一个项
         while (!str.equals("")) {
             if (str.charAt(0) == '+') {
@@ -107,26 +106,21 @@ public class Poly extends BaseFactor {
                 str = str.substring(temp.length());
             } else {
                 int stk = 0;
-                int scflag = 0;
                 int begin = 0;
-                int end = 0;
                 int flag = 0;
                 for (int i = 0; i < str.length(); i++) {
                     if (str.charAt(i) == '(') {
                         stk++;
                         if (stk == 1) {
                             begin = i;
-                            if (i > 0 && (str.charAt(i - 1) == 'n' ||
-                                    str.charAt(i - 1) == 's')) {
-                                scflag = 1;
-                            }
                         }
                     } else if (str.charAt(i) == ')') {
                         stk--;
                         if (stk == 0) {
-                            end = i;
-                            if (scflag == 0) { //检查括号内是不是表达式
-                                String newstr = str.substring(begin + 1, end);
+                            if (!(begin > 0 && (str.charAt(begin - 1) == 'n' ||
+                                    str.charAt(begin - 1) == 's'))) {
+                                //检查括号内是不是表达式
+                                String newstr = str.substring(begin + 1, i);
                                 if (!newstr.equals("") &&
                                         (newstr.charAt(0) != '+' &&
                                                 newstr.charAt(0) != '-')) {
@@ -134,24 +128,24 @@ public class Poly extends BaseFactor {
                                 }
                                 if (checkLegalPoly(newstr)) { //把括号去掉
                                     str = str.substring(0, begin) + "+1" +
-                                            str.substring(end + 1);
+                                            str.substring(i + 1);
                                     flag = 1;
                                     break;
                                 } else {
                                     return false;
                                 } //检查括号内是不是因子 //把sin(f(x))换成x
                             } else if (checkLegalFactor(str.substring(
-                                    begin + 1, end))) {
+                                    begin + 1, i))) {
                                 str = str.substring(0, begin - 3) +
-                                        "x" + str.substring(end + 1);
+                                        "x" + str.substring(i + 1);
                                 flag = 1;
                                 break;
                             } else {
                                 return false;
                             }
                         }
-                    }
-                }
+                    } //if
+                } //for
                 if (flag == 0) {
                     return false;
                 }
@@ -165,28 +159,14 @@ public class Poly extends BaseFactor {
             return false;
         }
         String str = str1;
-        if (str.charAt(0) == '(') {
-            int stk = 0;
-            int i;
-            for (i = 0; i < str.length(); ++i) {
-                if (str.charAt(i) == '(') {
-                    stk++;
-                } else if (str.charAt(i) == ')') {
-                    stk--;
-                    if (stk == 0) {
-                        break;
-                    }
-                }
+        if (str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')')
+        { //只能是表达式因子
+            String newstr = str.substring(1, str.length() - 1);
+            if (!newstr.equals("") && (newstr.charAt(0) != '+' &&
+                    newstr.charAt(0) != '-')) {
+                newstr = "+" + newstr;
             }
-            if (i == str.length() - 1) //只能是表达式因子
-            {
-                String newstr = str.substring(1, str.length() - 1);
-                if (!newstr.equals("") && (newstr.charAt(0) != '+' &&
-                        newstr.charAt(0) != '-')) {
-                    newstr = "+" + newstr;
-                }
-                return checkLegalPoly(newstr);
-            }
+            return checkLegalPoly(newstr);
         }
         //是其他因子
         String numStr = "[\\+\\-]?\\d+";
@@ -198,8 +178,8 @@ public class Poly extends BaseFactor {
             return true;
         } else //sin() cos()
         {
-            String sinFunStr = "(sin\\((?<inner>.*)\\)(\\^" + numStr + ")?)";
-            String cosFunStr = "(cos\\((?<inner>.*)\\)(\\^" + numStr + ")?)";
+            String sinFunStr = "sin\\((?<inner>.*)\\)(\\^" + numStr + ")?";
+            String cosFunStr = "cos\\((?<inner>.*)\\)(\\^" + numStr + ")?";
             r = Pattern.compile(sinFunStr);
             m = r.matcher(str);
             if (m.matches()) {

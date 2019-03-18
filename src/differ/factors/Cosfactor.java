@@ -50,8 +50,7 @@ public class Cosfactor extends Factor {
     }
 
     public boolean multMergeable(BaseFactor other) {
-        if (this.getClass() == other.getClass() &&
-                getIndex().equals(((Factor) other).getIndex())) {
+        if (this.getClass() == other.getClass()) {
             if (innerFactor.equals(((Cosfactor) other).innerFactor)) {
                 return true;
             }

@@ -22,6 +22,17 @@ public class Term extends BaseFactor {
         ListIterator<BaseFactor> iter = fl.listIterator();
         while (iter.hasNext()) {
             BaseFactor f = iter.next();
+            // 判断是不是只有一项的Poly
+            if (f instanceof Poly)
+            {
+                Poly p = (Poly) f;
+                if (p.getTermList().size() == 1)
+                {
+                    iter.add(p.getTermList().get(0));
+                    iter.previous();
+                    continue;
+                }
+            }
             // 先判断是不是Term
             if (f instanceof Term) {
                 Term t = (Term) f;
@@ -30,7 +41,6 @@ public class Term extends BaseFactor {
                     iter.add(ff);
                     iter.previous();
                 }
-
                 continue;
             }
             // 若不是Term判断能否与之前的合并
@@ -111,8 +121,8 @@ public class Term extends BaseFactor {
                 begin = i + 1;
             }
         }
-        sl.add(str.substring(begin, str.length()));
-        return (String[]) (sl.toArray(new String[sl.size()]));
+        sl.add(str.substring(begin));
+        return (sl.toArray(new String[0]));
     }
 
     public BigInteger getCoef() {
