@@ -32,6 +32,11 @@ public class Term extends BaseFactor {
                     iter.previous();
                     continue;
                 }
+                else if (p.getTermList().size() == 0)
+                {
+                    coef = coef.multiply(BigInteger.ZERO);
+                    continue;
+                }
             }
             // 先判断是不是Term
             if (f instanceof Term) {
