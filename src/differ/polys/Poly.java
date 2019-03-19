@@ -227,7 +227,8 @@ public class Poly extends BaseFactor {
         //首先看数字间有无空格
         String spaceInNum = "(\\d[ \\t]+\\d)" +
                 "|([\\*\\^][ \\t]*[\\+\\-][ \\t]+\\d)" +
-                "|(([\\+\\-][ \\t]*){2}[\\+\\-][ \\t]+\\d)";
+                "|(([\\+\\-][ \\t]*){2}[\\+\\-][ \\t]+\\d)" +
+                "|([ns][ \\t]*\\([ \\t]*[\\+\\-][ \\t]+\\d)";
         Pattern r = Pattern.compile(spaceInNum);
         Matcher m = r.matcher(str);
         if (m.find()) {
