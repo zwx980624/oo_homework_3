@@ -64,6 +64,7 @@ public class Poly extends BaseFactor {
             }
             String temp = getFirstTerm(str);
             str = str.substring(temp.length());
+            temp = temp.replaceAll("(\\+\\-)|(\\-\\+)", "\\-");
             Term t = new Term(temp);
             int pos = findSameTerm(termList, t);
             if (pos != -1) {
