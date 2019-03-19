@@ -1,5 +1,6 @@
 package differ.factors;
 
+import differ.polys.Poly;
 import differ.terms.Term;
 
 import java.math.BigInteger;
@@ -32,7 +33,23 @@ public class Cosfactor extends Factor {
                 }
             }
         }
-        innerFactor = BaseFactor.factorFactory(str.substring(4, i));
+        BaseFactor f = BaseFactor.factorFactory(str.substring(4, i));
+        if (f instanceof Poly)
+        {
+            Poly p = (Poly) f;
+            if (p.getTermList().size() == 1) {
+                Term t = p.getTermList().get(0);
+                if (t.getFactList().size() == 1 &&
+                        t.getCoef().equals(BigInteger.ONE)) {
+                    BaseFactor ff = t.getFactList().get(0);
+                    if (ff instanceof Factor)
+                    {
+                        f = ff;
+                    }
+                }
+            }
+        }
+        innerFactor = f;
     }
 
     public BaseFactor getInnerFactor()
