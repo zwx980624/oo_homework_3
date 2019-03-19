@@ -35,6 +35,11 @@ public class Sinfactor extends Factor {
         innerFactor = BaseFactor.factorFactory(str.substring(4, i));
     }
 
+    public BaseFactor getInnerFactor()
+    {
+        return innerFactor;
+    }
+
     public Term diff() {
         ArrayList<BaseFactor> fl = new ArrayList<>();
         BigInteger idx = this.getIndex();

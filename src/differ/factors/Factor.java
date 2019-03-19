@@ -35,7 +35,7 @@ public abstract class Factor extends BaseFactor {
         if (m.matches()) {
             idx = new BigInteger(m.group(1));
         }
-        if (idx.compareTo(BigInteger.valueOf(10000)) > 0) {
+        if (idx.abs().compareTo(BigInteger.valueOf(10000)) > 0) {
             throw new NumberFormatException();
         }
         return idx;

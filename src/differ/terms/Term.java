@@ -1,7 +1,9 @@
 package differ.terms;
 
 import differ.factors.BaseFactor;
+import differ.factors.Cosfactor;
 import differ.factors.Factor;
+import differ.factors.Sinfactor;
 import differ.polys.Poly;
 
 import java.math.BigInteger;
@@ -23,17 +25,13 @@ public class Term extends BaseFactor {
         while (iter.hasNext()) {
             BaseFactor f = iter.next();
             // 判断是不是只有一项的Poly
-            if (f instanceof Poly)
-            {
+            if (f instanceof Poly) {
                 Poly p = (Poly) f;
-                if (p.getTermList().size() == 1)
-                {
+                if (p.getTermList().size() == 1) {
                     iter.add(p.getTermList().get(0));
                     iter.previous();
                     continue;
-                }
-                else if (p.getTermList().size() == 0)
-                {
+                } else if (p.getTermList().size() == 0) {
                     coef = coef.multiply(BigInteger.ZERO);
                     continue;
                 }
@@ -47,6 +45,40 @@ public class Term extends BaseFactor {
                     iter.previous();
                 }
                 continue;
+            }
+            if (f instanceof Sinfactor) {
+                Sinfactor tmp = (Sinfactor) f;
+                Term tempt = new Term(BigInteger.ZERO,
+                        new ArrayList<BaseFactor>());
+                int flag = 0;
+                if (tmp.getInnerFactor() instanceof Poly) {
+                    if (((Poly) tmp.getInnerFactor()).getTermList().size() == 0)
+                    {
+                        flag = 1;
+                    }
+                } // 0^0 = 1
+                if (flag == 1 || tmp.getInnerFactor().equals(tempt)) {
+                    if (!tmp.getIndex().equals(BigInteger.ZERO)) {
+                        coef = BigInteger.ZERO;
+                    }
+                    continue;
+                }
+            }
+            if (f instanceof Cosfactor) {
+                Cosfactor tmp = (Cosfactor) f;
+                Term tempt = new Term(BigInteger.ZERO,
+                        new ArrayList<BaseFactor>());
+                int flag = 0;
+                if (tmp.getInnerFactor() instanceof Poly) {
+                    if (((Poly) tmp.getInnerFactor()).getTermList().size() == 0)
+                    {
+                        flag = 1;
+                    }
+                } // 0^0 = 1
+                if (flag == 1 || tmp.getInnerFactor().equals(tempt))
+                {
+                    continue;
+                }
             }
             // 若不是Term判断能否与之前的合并
             int pos = findSameFact(factList, f);
@@ -72,6 +104,7 @@ public class Term extends BaseFactor {
         String str = str1;
         coef = BigInteger.ONE;
         factList = new ArrayList<>();
+        ArrayList<BaseFactor> fl = new ArrayList<>();
         str = str.replaceAll("\\s+", "");
         String[] factstrs = splitbymult(str);
         // 处理第一非常数项带正负号,去掉第一个符号，并将影响其移入coef中
@@ -94,6 +127,67 @@ public class Term extends BaseFactor {
             }
             //不是常数时，一定是变量因子
             BaseFactor f = Factor.factorFactory(factstrs[i]); //调用静态工厂方法
+            fl.add(f);
+        }
+        ListIterator<BaseFactor> iter = fl.listIterator();
+        while (iter.hasNext()) {
+            BaseFactor f = iter.next();
+            // 判断是不是只有一项的Poly
+            if (f instanceof Poly) {
+                Poly p = (Poly) f;
+                if (p.getTermList().size() == 1) {
+                    iter.add(p.getTermList().get(0));
+                    iter.previous();
+                    continue;
+                } else if (p.getTermList().size() == 0) {
+                    coef = coef.multiply(BigInteger.ZERO);
+                    continue;
+                }
+            }
+            // 先判断是不是Term
+            if (f instanceof Term) {
+                Term t = (Term) f;
+                coef = coef.multiply(t.getCoef());
+                for (BaseFactor ff : t.getFactList()) {
+                    iter.add(ff);
+                    iter.previous();
+                }
+                continue;
+            }
+            if (f instanceof Sinfactor) {
+                Sinfactor tmp = (Sinfactor) f;
+                Term tempt = new Term(BigInteger.ZERO,
+                        new ArrayList<BaseFactor>());
+                int flag = 0;
+                if (tmp.getInnerFactor() instanceof Poly) {
+                    if (((Poly) tmp.getInnerFactor()).getTermList().size() == 0)
+                    {
+                        flag = 1;
+                    }
+                } // 0^0 = 1
+                if (flag == 1 || tmp.getInnerFactor().equals(tempt)) {
+                    if (!tmp.getIndex().equals(BigInteger.ZERO)) {
+                        coef = BigInteger.ZERO;
+                    }
+                    continue;
+                }
+            }
+            if (f instanceof Cosfactor) {
+                Cosfactor tmp = (Cosfactor) f;
+                Term tempt = new Term(BigInteger.ZERO,
+                        new ArrayList<BaseFactor>());
+                int flag = 0;
+                if (tmp.getInnerFactor() instanceof Poly) {
+                    if (((Poly) tmp.getInnerFactor()).getTermList().size() == 0)
+                    {
+                        flag = 1;
+                    }
+                } // 0^0 = 1
+                if (flag == 1 || tmp.getInnerFactor().equals(tempt)) {
+                    continue;
+                }
+            }
+            // 若不是Term判断能否与之前的合并
             int pos = findSameFact(factList, f);
             if (pos != -1) {
                 // 如果有幸进入这里，一定是Factor类型的，可以放心转换
