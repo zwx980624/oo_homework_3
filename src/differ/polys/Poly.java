@@ -6,6 +6,7 @@ import differ.terms.Term;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,7 +15,23 @@ public class Poly extends BaseFactor {
 
     public Poly(ArrayList<Term> tl) {
         termList = new ArrayList<Term>();
-        for (Term t : tl) {
+        ListIterator<Term> iter = tl.listIterator();
+        while (iter.hasNext()) {
+            Term t = iter.next();
+            if (t.getCoef().equals(BigInteger.ONE) &&
+                    t.getFactList().size() == 1)
+            {
+                BaseFactor f = t.getFactList().get(0);
+                if (f instanceof Poly)
+                {
+                    Poly p = (Poly) f;
+                    for (Term tt : p.getTermList()) {
+                        iter.add(tt);
+                        iter.previous();
+                    }
+                    continue;
+                }
+            }
             int pos = findSameTerm(termList, t);
             if (pos != -1) {
                 termList.set(pos, termList.get(pos).merge(t));
@@ -58,6 +75,7 @@ public class Poly extends BaseFactor {
         str = str.replaceAll("\\*\\+", "\\*");
 
         // 从左到右处理，找到每一个项
+        ArrayList<Term> tl = new ArrayList<>();
         while (!str.equals("")) {
             if (str.charAt(0) == '+') {
                 str = str.substring(1);
@@ -66,6 +84,23 @@ public class Poly extends BaseFactor {
             str = str.substring(temp.length());
             temp = temp.replaceAll("(\\+\\-)|(\\-\\+)", "\\-");
             Term t = new Term(temp);
+            tl.add(t);
+        }
+        ListIterator<Term> iter = tl.listIterator();
+        while (iter.hasNext()) {
+            Term t = iter.next();
+            if (t.getCoef().equals(BigInteger.ONE) &&
+                    t.getFactList().size() == 1) {
+                BaseFactor f = t.getFactList().get(0);
+                if (f instanceof Poly) {
+                    Poly p = (Poly) f;
+                    for (Term tt : p.getTermList()) {
+                        iter.add(tt);
+                        iter.previous();
+                    }
+                    continue;
+                }
+            }
             int pos = findSameTerm(termList, t);
             if (pos != -1) {
                 termList.set(pos, termList.get(pos).merge(t));
